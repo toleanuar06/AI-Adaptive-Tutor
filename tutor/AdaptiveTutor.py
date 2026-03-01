@@ -1,7 +1,13 @@
 import time
-import time
 import subprocess
 import os
+from google import genai
+
+# ==========================================
+# 0. ЖАСАНДЫ ИНТЕЛЛЕКТ БАПТАУЛАРЫ
+# ==========================================
+# ОСЫ ЖЕРГЕ GOOGLE AI STUDIO-ДАН АЛҒАН КІЛТТІ ҚОЙЫҢЫЗ:
+API_KEY = "AIzaSyDr8L74F7X32fBBuN3mQBxd7jb4YM6x860"
 
 # ==========================================
 # 1. ДЕРЕКҚОР ЖӘНЕ ОҚУ ПРОГРАММАСЫ
@@ -26,25 +32,47 @@ TASKS = {
 class KnowledgeProfile:
     def __init__(self, name):
         self.name = name
-        # Оқушының әр тақырып бойынша білім деңгейі (Бастапқыда 50%)
         self.skills = {"Basics": 50, "Loops": 50}
 
     def update_skill(self, topic, is_correct):
         if is_correct:
-            self.skills[topic] = min(100, self.skills[topic] + 20)  # Дұрыс болса 20% қосамыз
+            self.skills[topic] = min(100, self.skills[topic] + 20)
         else:
-            self.skills[topic] = max(0, self.skills[topic] - 15)  # Қате болса 15% аламыз
+            self.skills[topic] = max(0, self.skills[topic] - 15)
 
     def get_skill_level(self, topic):
         return self.skills[topic]
 
 
 # ==========================================
-# 3. НАҒЫЗ КОМПИЛЯТОРМЕН ТАЛДАУ (g++ INTEGRATION)
+# 3. НАҒЫЗ КОМПИЛЯТОР + AI ҰСТАЗ (LLM)
 # ==========================================
 class CodeAnalyzer:
-    def analyze(self, code, topic):
-        # 1. Оқушының кодын толыққанды C++ бағдарламасына айналдырамыз
+    def __init__(self):
+        # Жаңа SDK арқылы клиентті іске қосу
+        self.client = genai.Client(api_key=API_KEY)
+
+    def get_ai_feedback(self, code, task_desc, error_text):
+        prompt = f"""
+        Сен C++ бағдарламалау тілінен дәріс беретін тәжірибелі, өте мейірімді ұстазсың.
+        Оқушының тапсырмасы: "{task_desc}"
+        Оқушы жазған код: "{code}"
+        Компилятор мынадай қате шығарды: "{error_text}"
+
+        Сенің міндетің: Осы қатенің неліктен шыққанын қазақ тілінде қарапайым әрі түсінікті етіп түсіндіру.
+        Ескерту: Дұрыс кодты ешқашан толығымен жазып берме! Тек қатені нұсқап, оқушының өзі ойлануы үшін кішкене ғана бағыт (hint) бер. Жауабың қысқа болсын (2-3 сөйлем).
+        """
+        try:
+            # Жаңа заманауи модельді қолданамыз
+            response = self.client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt
+            )
+            return response.text
+        except Exception as e:
+            return f"AI жүйесіне қосылуда қате шықты: {e}"
+
+    def analyze(self, code, topic, task_desc):
         cpp_template = f"""
         #include <iostream>
         using namespace std;
@@ -54,38 +82,39 @@ class CodeAnalyzer:
         }}
         """
 
-        # 2. Оны уақытша файлға сақтаймыз
-        with open("../.gitignore/temp_code.cpp", "w", encoding="utf-8") as f:
+        with open("temp_code.cpp", "w", encoding="utf-8") as f:
             f.write(cpp_template)
 
-        # 3. Компьютердегі g++ компиляторын іске қосамыз
         try:
             compile_process = subprocess.run(
                 ["g++", "temp_code.cpp", "-o", "temp_run.exe"],
                 capture_output=True, text=True
             )
         except Exception as e:
-            return False, f"[ЖҮЙЕЛІК ҚАТЕ]: g++ компиляторы табылмады немесе іске қосылмады. {e}"
+            return False, f"[ЖҮЙЕЛІК ҚАТЕ]: g++ табылмады. {e}"
 
-        # 4. ЕГЕР СИНТАКСИС ҚАТЕ БОЛСА (g++ қате тапса)
+        # ЕГЕР СИНТАКСИС ҚАТЕ БОЛСА -> AI-ДАН КӨМЕК СҰРАЙМЫЗ
         if compile_process.returncode != 0:
-            # Қатенің мәтінін оқушыға түсінікті етіп қысқартып береміз
             error_msg = compile_process.stderr.split("temp_code.cpp")[
                 1] if "temp_code.cpp" in compile_process.stderr else compile_process.stderr
-            return False, f"[КОМПИЛЯЦИЯ ҚАТЕСІ]: Сіздің кодыңызда синтаксистік қате бар:\n{error_msg.strip()[:250]}"
 
-        # 5. ЕГЕР КОМПИЛЯЦИЯДАН СӘТТІ ӨТСЕ, ЛОГИКАСЫН ТЕКСЕРЕМІЗ
+            print("\n[AI ҰСТАЗ ОЙЛАНЫП ЖАТЫР...]")
+            ai_explanation = self.get_ai_feedback(code, task_desc, error_msg.strip()[:300])
+
+            return False, f"[AI ҰСТАЗДЫҢ КЕҢЕСІ]:\n{ai_explanation}"
+
+        # ЛОГИКАЛЫҚ ТЕКСЕРІС
         if topic == "Basics":
             if "cout" not in code:
-                return False, "[ЛОГИКАЛЫҚ ҚАТЕ]: Код жұмыс істеп тұр, бірақ экранға ештеңе шығарған жоқсыз ('cout' ұмыттыңыз)."
+                return False, "[ЛОГИКАЛЫҚ ҚАТЕ]: Экранға ештеңе шығарған жоқсыз ('cout' ұмыттыңыз)."
             return True, "[ТАМАША]: Код сәтті компиляциядан өтті және логикасы дұрыс!"
 
         elif topic == "Loops":
             if "while" not in code and "for" not in code:
-                return False, "[ЛОГИКАЛЫҚ ҚАТЕ]: Код жұмыс істейді, бірақ тапсырма шарты орындалмады. Цикл (for/while) қолданыңыз."
+                return False, "[ЛОГИКАЛЫҚ ҚАТЕ]: Тапсырма шарты орындалмады. Цикл қолданыңыз."
             if "++" not in code and "+=" not in code and "--" not in code:
-                return False, "[ЛОГИКАЛЫҚ ҚАТЕ]: Итератор (қадам) көрсетілмеген. Бұл шексіз циклге әкелуі мүмкін!"
-            return True, "[ТАМАША]: Код сәтті компиляциядан өтті және цикл дұрыс жазылған!"
+                return False, "[ЛОГИКАЛЫҚ ҚАТЕ]: Итератор көрсетілмеген. Бұл шексіз циклге әкеледі!"
+            return True, "[ТАМАША]: Код сәтті компиляциядан өтті!"
 
         return False, "[ҚАТЕ]: Жүйе кодты бағалай алмады."
 
@@ -102,21 +131,17 @@ class IntelligentTutor:
         print(f"\n{'=' * 40}\n[ПӘН]: {topic} тақырыбы басталды\n{'=' * 40}")
 
         while True:
-            # Оқушының қазіргі деңгейін анықтау
             current_level = self.profile.get_skill_level(topic)
             print(f"\n[СІЗДІҢ ДЕҢГЕЙІҢІЗ]: {current_level}%")
 
-            # ҚИЫНДЫҚТЫ БЕЙІМДЕУ (SCAFFOLDING)
-            # Егер білім деңгейі 60%-дан төмен түсіп кетсе, жеңіл есеп береміз (level 1)
             difficulty = 0 if current_level < 60 else 1
             task = TASKS[topic][difficulty]
 
             print(f"\n>>> ТАПСЫРМА (Қиындық деңгейі - {task['level']}):")
             print(task['desc'])
 
-            # Егер оқушы қатты қинала бастаса (деңгейі < 40%), көмек көрсетеміз
             if current_level < 40 and "hint" in task:
-                print(f"[AI КӨМЕКШІ]: {task['hint']}")
+                print(f"[ЖҮЙЕЛІК КӨМЕКШІ]: {task['hint']}")
 
             print("-" * 40)
             print("C++ кодыңыздан бір жол жазыңыз (немесе шығу үшін 'q' басыңыз):")
@@ -125,14 +150,12 @@ class IntelligentTutor:
             if user_code.lower() == 'q':
                 break
 
-            # 3. Кодты талдау және бағалау
-            is_correct, feedback = self.analyzer.analyze(user_code, topic)
+            # ТАЛДАУҒА ЖІБЕРУ
+            is_correct, feedback = self.analyzer.analyze(user_code, topic, task['desc'])
             print(f"\n{feedback}")
 
-            # 4. Профильді жаңарту
             self.profile.update_skill(topic, is_correct)
 
-            # Егер деңгей 100% болса, тақырыпты жабамыз
             if self.profile.get_skill_level(topic) >= 100:
                 print(f"\n[ҚҰТТЫҚТАЙМЫЗ!]: Сіз '{topic}' тақырыбын толық меңгердіңіз!")
                 break
@@ -144,15 +167,11 @@ class IntelligentTutor:
 # БАҒДАРЛАМАНЫ ІСКЕ ҚОСУ
 # ==========================================
 if __name__ == "__main__":
-    print("Интерактивті Адаптивті Оқу платформасына қош келдіңіз!")
+    print("AI-Adaptive Оқу платформасына қош келдіңіз!")
     name = input("Есіміңіз кім? ")
-
     tutor = IntelligentTutor(name)
 
-    # Алдымен "Basics" тақырыбын оқытамыз
     tutor.start_lesson("Basics")
-
-    # Одан кейін "Loops" тақырыбына өтеміз
     tutor.start_lesson("Loops")
 
     print("\nОқу курсы аяқталды. Сау болыңыз!")
