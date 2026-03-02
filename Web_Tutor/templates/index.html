@@ -2,56 +2,51 @@
 <html lang="kk">
 <head>
     <meta charset="UTF-8">
-    <title>C++ Курсы | AI-Платформа</title>
+    <title>C++ Masterclass | AI-Tutor</title>
     <style>
         body { margin: 0; display: flex; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1e1e1e; color: #fff; }
 
-        /* СОЛ ЖАҚ МӘЗІР (SIDEBAR) */
-        .sidebar { width: 260px; background-color: #252526; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.5); z-index: 10; overflow-y: auto;}
-        .sidebar h2 { color: #00ffcc; font-size: 20px; border-bottom: 1px solid #444; padding-bottom: 10px;}
-        .lesson-btn { display: block; width: 100%; text-align: left; background: none; border: none; color: #ccc; padding: 12px; margin-bottom: 5px; cursor: pointer; font-size: 16px; border-radius: 5px; transition: 0.3s;}
+        .sidebar { width: 280px; background-color: #252526; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.5); z-index: 10; display: flex; flex-direction: column;}
+        .sidebar h2 { color: #00ffcc; font-size: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;}
+        .lesson-btn { display: block; width: 100%; text-align: left; background: none; border: none; color: #ccc; padding: 12px; margin-bottom: 5px; cursor: pointer; font-size: 15px; border-radius: 5px; transition: 0.3s;}
         .lesson-btn:hover { background-color: #333; color: #fff;}
         .lesson-btn.active { background-color: #004433; color: #00ffcc; border-left: 4px solid #00ffcc; font-weight: bold;}
 
-        /* НЕГІЗГІ БӨЛІК */
         .main-content { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-
-        /* ТЕОРИЯ БЛОГЫ */
         .theory-box { background-color: #2d2d30; padding: 25px; border-radius: 8px; border-top: 4px solid #007acc; }
-        .theory-box h1 { margin-top: 0; color: #569cd6; }
-        .theory-box p { line-height: 1.6; font-size: 16px; color: #d4d4d4;}
-        .code-example { background-color: #1e1e1e; padding: 10px; border-radius: 5px; font-family: monospace; color: #ce9178; border: 1px solid #444;}
+        .theory-box h1 { margin-top: 0; color: #569cd6; font-size: 26px;}
+        .theory-box p, .theory-box li { line-height: 1.6; font-size: 16px; color: #d4d4d4;}
+        .code-example { background-color: #1e1e1e; padding: 15px; border-radius: 5px; font-family: 'Consolas', monospace; color: #ce9178; border: 1px solid #444; overflow-x: auto;}
 
-        /* ПРАКТИКА ЖӘНЕ AI ТРЕНАЖЕР */
         .practice-box { background-color: #333; padding: 20px; border-radius: 8px; border-left: 5px solid #00ffcc; }
         .practice-box h2 { margin-top: 0; color: #00ffcc; font-size: 18px;}
-        textarea { width: 100%; height: 150px; background-color: #000; color: #00ff00; font-family: monospace; padding: 15px; font-size: 16px; border: 1px solid #555; border-radius: 5px; box-sizing: border-box; resize: vertical;}
+        textarea { width: 100%; height: 150px; background-color: #000; color: #00ff00; font-family: 'Consolas', monospace; padding: 15px; font-size: 16px; border: 1px solid #555; border-radius: 5px; box-sizing: border-box; resize: vertical;}
         button.run-btn { background-color: #00ffcc; color: #000; padding: 12px 25px; border: none; font-size: 16px; cursor: pointer; margin-top: 15px; font-weight: bold; border-radius: 5px; transition: 0.2s;}
         button.run-btn:hover { background-color: #00ccaa; transform: scale(1.02);}
-        #feedback { margin-top: 20px; padding: 15px; background-color: #222; border-radius: 5px; display: none; border-left: 4px solid #ffaa00;}
+        #feedback { margin-top: 20px; padding: 15px; background-color: #222; border-radius: 5px; display: none; border-left: 4px solid #ffaa00; font-size: 15px;}
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <h2>C++ НЕГІЗДЕРІ</h2>
-        <button class="lesson-btn active" onclick="loadLesson(1, 'Кіріспе (Шығару операторлары)')" id="btn-1">1. Экранға шығару (cout)</button>
-        <button class="lesson-btn" onclick="loadLesson(2, 'Айнымалылар және Математика')" id="btn-2">2. Айнымалылар (Variables)</button>
-        <button class="lesson-btn" onclick="loadLesson(3, 'Шартты операторлар (if/else)')" id="btn-3">3. Шартты операторлар (If/Else)</button>
+        <h2>C++ Masterclass</h2>
+
+        <div style="background-color: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #444;">
+            <h3 style="color: #00ffcc; font-size: 15px; margin-top: 0;">👁️ AI ЭРГОНОМИКА</h3>
+            <img src="/video_feed" style="width: 100%; border-radius: 5px; border: 2px solid #333;" alt="Камера жүктелуде...">
+            <p style="margin: 10px 0 5px 0; font-size: 14px;">Ұпай: <strong id="health-score" style="color: #00ffcc;">100</strong></p>
+            <p style="margin: 0; font-size: 14px;">Отырыс: <span id="posture-status" style="font-weight: bold; color: lime;">GOOD</span></p>
+        </div>
+
+        <div id="sidebar-menu" style="flex: 1; overflow-y: auto;">
+            </div>
     </div>
 
     <div class="main-content">
-
-        <div class="theory-box" id="theory-content">
-            <h1>1-сабақ: Экранға шығару</h1>
-            <p>C++ тілінде экранға мәтін шығару үшін <b>std::cout</b> (character output) объектісі қолданылады. Бұл команданы қолдану үшін бағдарламаның басында <i>#include &lt;iostream&gt;</i> кітапханасын қосу міндетті.</p>
-            <p>Жаңа жолға өту үшін <b>std::endl</b> немесе <b>\n</b> белгісін қолданамыз.</p>
-            <p><b>Мысал:</b></p>
-            <div class="code-example">std::cout << "Сәлем, Әлем!" << std::endl;</div>
-        </div>
+        <div class="theory-box" id="theory-content"></div>
 
         <div class="practice-box">
-            <h2>💻 ПРАКТИКА: ТАПСЫРМАНЫ ОРЫНДАҢЫЗ</h2>
+            <h2>💻 AI-ТРЕНАЖЕР: ПРАКТИКА</h2>
             <p id="task-title" style="color: #ccc;"><i>AI тапсырма құрастыруда... Күте тұрыңыз...</i></p>
             <p id="task-desc"></p>
 
@@ -59,64 +54,65 @@
             <button class="run-btn" onclick="sendCode()">Тексеру (Run)</button>
             <div id="feedback"></div>
         </div>
-
     </div>
 
     <script>
-        let currentTopic = "Кіріспе (Шығару операторлары)";
         let currentLevel = 10;
         let currentTaskDesc = "";
+        let activeLessonId = 1;
 
-        // САБАҚТАРДЫҢ ТЕОРИЯСЫ (ДЕРЕКҚОР)
-        const theoryData = {
-            1: {
-                title: "1-сабақ: Экранға шығару",
-                text: "<p>C++ тілінде экранға мәтін шығару үшін <b>std::cout</b> қолданылады. Мәтінді міндетті түрде қос тырнақшаның ішіне жазу керек.</p><p>Жаңа жолға өту үшін <b>std::endl</b> қолданамыз.</p><div class='code-example'>std::cout << \"Сәлем!\" << std::endl;</div>"
-            },
-            2: {
-                title: "2-сабақ: Айнымалылар",
-                text: "<p>Айнымалы (Variable) – бұл мәліметтерді (сандар, мәтіндер) сақтайтын компьютер жадысындағы ұяшық.</p><p>Бүтін сандарды сақтау үшін <b>int</b> (integer) қолданылады.</p><div class='code-example'>int age = 20;<br>std::cout << age;</div>"
-            },
-            3: {
-                title: "3-сабақ: Шартты операторлар",
-                text: "<p>Егер бағдарламада белгілі бір шартты тексеру қажет болса, <b>if</b> (егер) және <b>else</b> (әйтпесе) операторларын қолданамыз.</p><div class='code-example'>if (age >= 18) { std::cout << \"Рұқсат\"; }</div>"
-            }
+        const courseData = {
+            1: { title: "1. Кіріспе: Экранға шығару", aiTopic: "C++ тілінде экранға шығару (cout)", theory: "<p>C++ тілінде экранға мәтін шығару үшін <b>std::cout</b> қолданылады.</p><div class='code-example'>#include &lt;iostream&gt;<br>using namespace std;<br>int main() { cout &lt;&lt; \"Сәлем!\" &lt;&lt; endl; return 0; }</div>" },
+            2: { title: "2. Айнымалылар және Деректер", aiTopic: "C++ тіліндегі айнымалылар (int, double, string)", theory: "<p>Айнымалы (Variable) – мәліметтерді сақтайтын жад ұяшығы.</p><div class='code-example'>int age = 20;<br>double pi = 3.14;<br>cout &lt;&lt; age;</div>" },
+            3: { title: "3. Математикалық операциялар", aiTopic: "C++ математикалық операторлары (+, -, *, /, %)", theory: "<p>C++ тілінде қарапайым математиканы орындауға болады.</p><div class='code-example'>int a = 10;<br>int b = 3;<br>cout &lt;&lt; a % b; // Нәтиже: 1</div>" },
+            4: { title: "4. Шартты операторлар", aiTopic: "C++ if-else шартты операторлары", theory: "<p>Егер бағдарламада белгілі бір шартты тексеру қажет болса, <b>if</b> және <b>else</b> қолданамыз.</p><div class='code-example'>if (score >= 50) cout &lt;&lt; \"Өттіңіз\";</div>" },
+            5: { title: "5. Циклдер (for, while)", aiTopic: "C++ тіліндегі циклдер (for loop, while loop)", theory: "<p>Бір кодты қайталау үшін циклдер қолданылады.</p><div class='code-example'>for(int i = 0; i &lt; 5; i++) cout &lt;&lt; i;</div>" }
         };
 
-        // САБАҚТЫ АУЫСТЫРУ ФУНКЦИЯСЫ
-        function loadLesson(lessonId, topicName) {
-            // Мәзірдегі белсенді батырманы өзгерту
+        function initSidebar() {
+            let sidebarMenu = document.getElementById("sidebar-menu");
+            sidebarMenu.innerHTML = "";
+            for (let id in courseData) {
+                let btn = document.createElement("button");
+                btn.className = "lesson-btn" + (id == 1 ? " active" : "");
+                btn.id = "btn-" + id;
+                btn.innerText = courseData[id].title;
+                btn.onclick = () => loadLesson(id);
+                sidebarMenu.appendChild(btn);
+            }
+        }
+
+        function loadLesson(lessonId) {
             document.querySelectorAll('.lesson-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('btn-' + lessonId).classList.add('active');
+            activeLessonId = lessonId;
 
-            // Теорияны жаңарту
-            document.getElementById('theory-content').innerHTML = `<h1>${theoryData[lessonId].title}</h1>${theoryData[lessonId].text}`;
-
-            // Жаңа тақырыпты сақтап, AI-дан жаңа тапсырма сұрау
-            currentTopic = topicName;
+            document.getElementById('theory-content').innerHTML = `<h1>${courseData[lessonId].title}</h1>${courseData[lessonId].theory}`;
             document.getElementById("code-editor").value = "";
             document.getElementById("feedback").style.display = "none";
             fetchNewTask();
         }
 
-        // AI-ДАН ТАПСЫРМА СҰРАУ
         async function fetchNewTask() {
             document.getElementById("task-title").innerHTML = "<i>AI жаңа тапсырма құрастыруда...</i>";
             document.getElementById("task-desc").innerHTML = "";
+            document.getElementById("feedback").style.display = "none";
 
-            let response = await fetch('/get_task', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic: currentTopic, level: currentLevel })
-            });
-            let data = await response.json();
-
-            currentTaskDesc = data.desc;
-            document.getElementById("task-title").innerText = "Топсырма шарты:";
-            document.getElementById("task-desc").innerHTML = "<b>" + data.desc + "</b><br><br><span style='color: #888;'><i>Көмек: " + data.hint + "</i></span>";
+            try {
+                let response = await fetch('/get_task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: courseData[activeLessonId].aiTopic, level: currentLevel })
+                });
+                let data = await response.json();
+                currentTaskDesc = data.desc;
+                document.getElementById("task-title").innerText = "ТАПСЫРМА:";
+                document.getElementById("task-desc").innerHTML = "<b>" + data.desc + "</b><br><br><span style='color: #888;'><i>Көмек: " + data.hint + "</i></span>";
+            } catch(e) {
+                document.getElementById("task-title").innerText = "Қате шықты!";
+            }
         }
 
-        // КОДТЫ ТЕКСЕРУГЕ ЖІБЕРУ
         async function sendCode() {
             let code = document.getElementById("code-editor").value;
             let feedback = document.getElementById("feedback");
@@ -132,14 +128,29 @@
 
             if (result.status === "success") {
                 feedback.innerHTML = "<span style='color: #00ffcc;'>" + result.message + "</span>";
-                currentLevel += 20; // Ұпай қосу
-                setTimeout(fetchNewTask, 3000); // 3 секундтан соң жаңа тапсырма беру
+                currentLevel += 10;
+                setTimeout(fetchNewTask, 3500);
             } else {
                 feedback.innerHTML = "<span style='color: #ff4444;'>[ҚАТЕ]:</span> " + result.message;
             }
         }
 
-        window.onload = fetchNewTask;
+        // Камера ұпайын тексеру
+        setInterval(async () => {
+            try {
+                let res = await fetch('/get_score');
+                let data = await res.json();
+                document.getElementById('health-score').innerText = data.score;
+                let postureEl = document.getElementById('posture-status');
+                postureEl.innerText = data.posture;
+                postureEl.style.color = data.posture.includes("BAD") ? "#ff4444" : "lime";
+            } catch (e) {}
+        }, 1000);
+
+        window.onload = () => {
+            initSidebar();
+            loadLesson(1);
+        };
     </script>
 </body>
 </html>
