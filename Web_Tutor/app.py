@@ -11,7 +11,7 @@ from google import genai
 app = Flask(__name__)
 
 # ЖАСАНДЫ ИНТЕЛЛЕКТ БАПТАУЛАРЫ
-API_KEY = "AIzaSyDD--7HNIReLv21N5wVca95Zto55xcAL_U"
+API_KEY = ""
 client = genai.Client(api_key=API_KEY)
 
 # ЭРГОНОМИКА ЖӘНЕ КАМЕРА БАПТАУЛАРЫ
